@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 export default function App() {
   return (
     <View style={styles.container}>
-      <h1>Welcome to Minesweeper Game!</h1>
+      <Text>Welcome to Minesweeper Game!</Text>
       <StatusBar style="auto" />
     </View>
   );
