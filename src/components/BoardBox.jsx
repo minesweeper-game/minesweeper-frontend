@@ -5,7 +5,7 @@ const BoardBox = ({ row, column}) => {
 		<View style={styles.box}>
 			<Text 
 				testID="text-row-columns"
-				style={styles.boxText}>{`${row}:${column}`}</Text>
+				style={styles.boxText}></Text>
 		</View>
 	)
 }
