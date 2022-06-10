@@ -3,10 +3,11 @@ import { StyleSheet, View, Text } from 'react-native'
 import GameBoard from './GameBoard'
 
 const GameScreen = ({ route, navigation }) => {
-    const { rows, columns, difficulty } = route.params
-    console.log(route.params)
+    const { rows, columns, difficulty, id } = route.params
+
     return (
         <View testID="container" style={styles.container}>
+            <Text>GAME ID: {id}</Text>
             <Text>LEVEL: {difficulty}</Text>
             <GameBoard 
                 rows={rows} 

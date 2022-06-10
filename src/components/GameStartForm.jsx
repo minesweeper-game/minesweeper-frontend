@@ -1,16 +1,17 @@
 import { StatusBar } from 'expo-status-bar'
-import { StyleSheet, Text, View, TextInput, Button, Alert, Keyboard } from 'react-native'
+import { StyleSheet, Text, View, TextInput, Button, Alert, Keyboard, ActivityIndicator } from 'react-native'
 import { useState } from 'react'
 import DropDownPicker from 'react-native-dropdown-picker';
+import doPOSTRequest from '../doPOSTRequest';
 
 const isValidRowAndColumnInputValue = (inputValue) => {
     return !Number.isNaN(inputValue) && (inputValue >= 3 && inputValue <= 17)
 }
 
-const GameStartForm = ({ navigation, testingDifficulty=null }) => {
+const GameStartForm = ({ navigation, testingDifficulty=null, fetchCall=null }) => {
     const [inputRows, setInputRows] = useState("")
     const [inputColumns, setInputColumns] = useState("")
-    //const [inputDifficulty, setInputDifficulty] = useState("")
+    const [showLoader, setShowLoader] = useState(false)
 
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [dropdownValue, setDropdownValue] = useState(null);
@@ -19,16 +20,6 @@ const GameStartForm = ({ navigation, testingDifficulty=null }) => {
         { value: 'medium', label: 'MEDIUM', testID: 'dropdown-medium' },
         { value: 'hard',   label: 'HARD',   testID: 'dropdown-hard' },
     ]);
-   
-    const fetchString = async () => {
-        setUsers([])
-        console.log("fetch started")
-        const response = await globalThis.fetch('https://reqres.in/api/users')
-        const json = await response.json()
-        console.log("fetch finished")
-        console.table(json.data)
-        setUsers(json.data)
-    }
 
     const onRowsChangeHandler = (rows) => {
         //console.log("ROWS: "+rows)
@@ -41,7 +32,7 @@ const GameStartForm = ({ navigation, testingDifficulty=null }) => {
         setInputColumns(columns)
     }
 
-    const onSubmitHandler = () => {
+    const onSubmitHandler = async () => {
         if (!isValidRowAndColumnInputValue(inputRows)){
             Alert.alert('Rows value should not be less than 3 and no more than 17')
             setInputRows("")
@@ -61,15 +52,34 @@ const GameStartForm = ({ navigation, testingDifficulty=null }) => {
             }
         }
 
-        navigation.navigate("GameScreen", {
+        setShowLoader(true)
+
+        if (fetchCall == null) fetchCall = doPOSTRequest
+
+        const response = await fetchCall({
             rows: parseInt(inputRows),
-            columns: parseInt(inputColumns),
-            difficulty: testingDifficulty ?? dropdownValue
+            cols: parseInt(inputColumns),
+            difficulty: (testingDifficulty ?? dropdownValue).toUpperCase()
+        })
+
+        setShowLoader(false)
+
+        if(response.detail != null) {
+            Alert.alert(response.detail)
+            return
+        }
+        
+        navigation.navigate("GameScreen", {
+            rows: parseInt(response.rows),
+            columns: parseInt(response.cols),
+            difficulty: response.difficulty,
+            id: response.id
         })
     }
     
     return (
         <View style={styles.container}>
+            <ActivityIndicator size="large" animating={showLoader}/>
             <View style={styles.fieldContainer}>
                 <View
                     style={styles.fieldContainer}>
@@ -122,12 +132,6 @@ const GameStartForm = ({ navigation, testingDifficulty=null }) => {
         </View>
     );
 }
-
-/*const selectOptions = [
-    { value: 'easy',   label: 'EASY' },
-    { value: 'medium', label: 'MEDIUM' },
-    { value: 'hard',   label: 'HARD' },
-]*/
 
 const styles = StyleSheet.create({
     container: {

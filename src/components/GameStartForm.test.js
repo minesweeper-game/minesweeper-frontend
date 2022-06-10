@@ -34,8 +34,17 @@ describe("<GameStartForm />", () => {
             const newRowValue    = 5
             const newColumnValue = 9
             const newDifficulty  = 'easy'
+            const mockId = "bd75c87c-5f4e-421a-a946-68c45775f8c8"
+            const mockResponse = {
+                rows: newRowValue,
+                cols: newColumnValue,
+                difficulty: newDifficulty.toUpperCase(),
+                id: mockId
+            }
             const navigate       = jest.fn()
-            const {getByTestId}  = render(<GameStartForm navigation={ { navigate } } testingDifficulty={newDifficulty}/>)
+            const mockCall       = jest.fn().mockReturnValue(mockResponse)
+                
+            const {getByTestId}  = render(<GameStartForm navigation={ { navigate } } testingDifficulty={newDifficulty} fetchCall={mockCall}/>)
 
             //when
             fireEvent.changeText(getByTestId("input-rows"), newRowValue.toString())
@@ -43,8 +52,12 @@ describe("<GameStartForm />", () => {
             fireEvent.press(getByTestId("button-start-game"))
 
             //then
-            expect(navigate).toHaveBeenCalledWith("GameScreen", {rows: newRowValue, columns: newColumnValue, difficulty: newDifficulty})
-        })
+            await waitFor(()=> {
+                //expect(navigate).toBeCalled()
+                expect(navigate).toHaveBeenCalledWith("GameScreen", {rows: newRowValue, columns: newColumnValue, difficulty: newDifficulty.toUpperCase(), id: mockId})
+            })
+            
+        }, 15000)
 
         it('should not create a new game if rows value is below 3', () => {
             //given
