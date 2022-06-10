@@ -1,4 +1,4 @@
-import { render, fireEvent } from 'test-utils';
+import { render, fireEvent, waitFor } from 'test-utils';
 import GameStartForm from './GameStartForm';
 import { Alert } from 'react-native';
 
@@ -29,12 +29,13 @@ describe("<GameStartForm />", () => {
             expect(buttonNewGame).toBeDefined()
         })
 
-        it('should navigate to GameScreen when row and column values are correct', () => {
+        it('should navigate to GameScreen when row and column values are correct', async () => {
             //given
             const newRowValue    = 5
             const newColumnValue = 9
+            const newDifficulty  = 'easy'
             const navigate       = jest.fn()
-            const {getByTestId}  = render(<GameStartForm navigation={ { navigate } }/>)
+            const {getByTestId}  = render(<GameStartForm navigation={ { navigate } } testingDifficulty={newDifficulty}/>)
 
             //when
             fireEvent.changeText(getByTestId("input-rows"), newRowValue.toString())
@@ -42,7 +43,7 @@ describe("<GameStartForm />", () => {
             fireEvent.press(getByTestId("button-start-game"))
 
             //then
-            expect(navigate).toHaveBeenCalledWith("GameScreen", {rows: newRowValue, columns: newColumnValue})
+            expect(navigate).toHaveBeenCalledWith("GameScreen", {rows: newRowValue, columns: newColumnValue, difficulty: newDifficulty})
         })
 
         it('should not create a new game if rows value is below 3', () => {

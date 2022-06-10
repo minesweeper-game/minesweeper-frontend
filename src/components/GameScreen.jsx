@@ -1,12 +1,13 @@
 import { StatusBar } from 'expo-status-bar'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, View, Text } from 'react-native'
 import GameBoard from './GameBoard'
 
 const GameScreen = ({ route, navigation }) => {
-    const { rows, columns } = route.params
+    const { rows, columns, difficulty } = route.params
     console.log(route.params)
     return (
         <View testID="container" style={styles.container}>
+            <Text>LEVEL: {difficulty}</Text>
             <GameBoard 
                 rows={rows} 
                 columns={columns} 
